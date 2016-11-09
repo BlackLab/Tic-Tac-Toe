@@ -1,0 +1,29 @@
+.game {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background-color: #66ccff;
+}
+
+.board {
+  display: inline-block;
+  background-color: red;
+}
+
+.board-row:after {
+  clear: both;
+  content: '';
+  display: block;
+}
+
+.square {
+  float: left;
+  width: 100px;
+  height: 100px;
+  line-height: 100px;
+  font-size: 34px;
+  text-align: center;
+  outline: none;
+}
