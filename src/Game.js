@@ -3,9 +3,9 @@ import './Game.css';
 
 function Square(props) {
     return (
-      <button className="square" onClick={() => props.onClick()}>
+      <div className="square" onClick={() => props.onClick()}>
         {props.value}
-      </button>
+      </div>
     );
 }
 
@@ -45,8 +45,11 @@ class Game extends Component {
           squares : Array(9).fill(null),
         }
       ],
-      xIsNext : true,
+      player : 1,
+      isStart : false,
     }
+    this.handleClick.bind(this);
+    this.reset.bind(this);
   }
 
   handleClick(i) {
@@ -56,14 +59,53 @@ class Game extends Component {
     if (calculateWinner(squares) || squares[i]) {
       return;
     }
-    squares[i] = this.state.xIsNext ? 'X' : 'O';
+    squares[i] = this.state.player === 1 ? 'X' : 'O';
     this.setState({
       history:history.concat([
         {
           squares : squares,
         }
       ]),
-      xIsNext: !this.state.xIsNext,
+      player: this.state.player === 1 ? 2 : 1,
+    },this.aiMove);
+  }
+
+  aiMove() {
+    const history = this.state.history;
+    const current = history[history.length - 1];
+    const squares = current.squares.slice();
+
+    const noSelect = [];
+    squares.forEach((e, index) => {
+      if(e === null) {
+        noSelect.push({index: index});
+      }
+    })
+
+    const randomIndex = noSelect[Math.floor(Math.random() * noSelect.length)]['index'];
+
+    if (calculateWinner(squares) || squares[randomIndex]) {
+      return;
+    }
+    squares[randomIndex] = this.state.player === 1 ? 'X' : 'O';
+    this.setState({
+      history:history.concat([
+        {
+          squares : squares,
+        }
+      ]),
+      player: this.state.player == 1 ? 2 : 1,
+    });
+  }
+
+  reset() {
+    this.setState({
+      history: [
+        {
+          squares : Array(9).fill(null),
+        }
+      ],
+      player : 1,
     });
   }
 
@@ -71,14 +113,25 @@ class Game extends Component {
     const history = this.state.history;
     const current = history[history.length - 1];
     const winner = calculateWinner(current.squares);
-    console.log(winner);
 
+    let announce;
+    if(winner) {
+      announce = (
+        <div className="announce">
+          <div>
+            {winner} Win !;
+          </div>
+          <button className="reset" onClick={() => this.reset()}>Reset</button>
+        </div>
+      );
+    }
     return (
       <div className="game">
         <Board 
           squares={current.squares}
           onClick={(i) => this.handleClick(i)}
         />
+        {announce}
       </div>
     );
   }
