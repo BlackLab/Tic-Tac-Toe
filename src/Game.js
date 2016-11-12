@@ -56,7 +56,7 @@ class Game extends Component {
     const history = this.state.history;
     const current = history[history.length - 1];
     const squares = current.squares.slice();
-    if (calculateWinner(squares) || squares[i]) {
+    if (calculateWinner(squares) || squares[i] || !this.state.isStart) {
       return;
     }
     squares[i] = this.state.player === 1 ? 'X' : 'O';
@@ -84,7 +84,7 @@ class Game extends Component {
 
     const randomIndex = noSelect[Math.floor(Math.random() * noSelect.length)]['index'];
 
-    if (calculateWinner(squares) || squares[randomIndex]) {
+    if (calculateWinner(squares) || squares[randomIndex] || !this.state.isStart) {
       return;
     }
     squares[randomIndex] = this.state.player === 1 ? 'X' : 'O';
@@ -94,7 +94,7 @@ class Game extends Component {
           squares : squares,
         }
       ]),
-      player: this.state.player == 1 ? 2 : 1,
+      player: this.state.player === 1 ? 2 : 1,
     });
   }
 
@@ -105,7 +105,13 @@ class Game extends Component {
           squares : Array(9).fill(null),
         }
       ],
-      player : 1,
+    });
+  }
+
+  choose(e) {
+    this.setState({
+      player: e.target.value,
+      isStart: true,
     });
   }
 
@@ -118,20 +124,37 @@ class Game extends Component {
     if(winner) {
       announce = (
         <div className="announce">
-          <div>
+          <div className="announce-title">
             {winner} Win !;
           </div>
-          <button className="reset" onClick={() => this.reset()}>Reset</button>
+          <button className="btn" onClick={() => this.reset()}>Reset</button>
+        </div>
+      );
+    }
+    let start;
+    if(!this.state.isStart) {
+      start = (
+        <div className="announce">
+          <div className="announce-title">
+            Choose a player ~
+          </div>
+          <button className="btn x" onClick={(e) => this.choose(e)} value="1">X</button>
+          <button className="btn o" onClick={(e) => this.choose(e)} value="2">O</button>
         </div>
       );
     }
     return (
       <div className="game">
+        <h1 className="title">Tic Tac Toe</h1>
         <Board 
           squares={current.squares}
           onClick={(i) => this.handleClick(i)}
         />
         {announce}
+        {start}
+        <div>
+          <button className="btn reset" onClick={() => this.reset()}>Reset</button>
+        </div>
       </div>
     );
   }
